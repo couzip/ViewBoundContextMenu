@@ -14,8 +14,8 @@ public class ContextInteractableView: UIView {
   
   private var hostingView: UIHostingView<AnyView>?
   
-  init() {
-    super.init(frame: .zero)
+  override init(frame: CGRect) {
+    super.init(frame: frame)
     addInteraction(UIContextMenuInteraction(delegate: self))
   }
   
@@ -32,30 +32,39 @@ public class ContextInteractableView: UIView {
   }
   
   public override func systemLayoutSizeFitting(_ targetSize: CGSize, withHorizontalFittingPriority horizontalFittingPriority: UILayoutPriority, verticalFittingPriority: UILayoutPriority) -> CGSize {
-    hostingView?.systemLayoutSizeFitting(targetSize, withHorizontalFittingPriority: horizontalFittingPriority, verticalFittingPriority: verticalFittingPriority) ?? .zero
+    hostingView?.systemLayoutSizeFitting(
+      targetSize,
+      withHorizontalFittingPriority: horizontalFittingPriority,
+      verticalFittingPriority: verticalFittingPriority
+    ) ?? .zero
   }
   
   public override func sizeThatFits(_ size: CGSize) -> CGSize {
     hostingView?.sizeThatFits(size) ?? .zero
   }
-}
 
-private extension ContextInteractableView {
   func configureHostingView() {
     if let content = content?() {
       if hostingView == nil {
         hostingView = UIHostingView(rootView: AnyView(content))
-        
         addSubview(hostingView!)
-        
         hostingView!.translatesAutoresizingMaskIntoConstraints = false
         
+        hostingView!.setContentHuggingPriority(.required, for: .horizontal)
+        hostingView!.setContentHuggingPriority(.required, for: .vertical)
+        hostingView!.setContentCompressionResistancePriority(.required, for: .horizontal)
+        hostingView!.setContentCompressionResistancePriority(.required, for: .vertical)
+        
         NSLayoutConstraint.activate([
-          hostingView!.leadingAnchor.constraint(equalTo: leadingAnchor),
-          hostingView!.trailingAnchor.constraint(equalTo: trailingAnchor),
           hostingView!.topAnchor.constraint(equalTo: topAnchor),
-          hostingView!.bottomAnchor.constraint(equalTo: bottomAnchor)
+          hostingView!.leadingAnchor.constraint(equalTo: leadingAnchor)
         ])
+        
+        // NSLayoutConstraint.activate([
+        //   heightAnchor.constraint(equalTo: hostingView!.heightAnchor),
+        //   widthAnchor.constraint(equalTo: hostingView!.widthAnchor)
+        // ])
+
       } else {
         hostingView?.rootView = AnyView(content)
       }

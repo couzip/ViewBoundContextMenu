@@ -15,6 +15,8 @@ public struct ViewBoundContextMenu: UIViewRepresentable {
     let view = ContextInteractableView()
     view.actions = actions
     view.content = content
+    view.setContentHuggingPriority(.required, for: .horizontal)
+    view.setContentCompressionResistancePriority(.required, for: .horizontal)
     
     return view
   }
